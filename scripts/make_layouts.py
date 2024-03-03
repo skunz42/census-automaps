@@ -5,22 +5,22 @@ import sys
 
 import arcpy
 
-# Plan:
-# Ethnicity as parameter
-# Add map if doesn't exist w/ Ethnicity name
-# Set map as current map
-# Add county and state shapefiles
+from name_id_mapper import get_mapping
 
+# Constants
+# TODO: change to rel path resolutions
 GDB_PATH = r"C:\census-automaps\GDBs"
 PROJECT_PATH = r"C:\census-automaps\ProProjects"
+
+# TODO: change to arguments
 TEMPLATE_PATH = r"C:\census-automaps\ProProjects\Template\Template.aprx"
 TOTAL_FC_PATH = r"C:\census-automaps\GDBs\Total.gdb\CountiesTotal"
 SDE_PATH = r"C:\census-automaps\SDEs\censusdata.sde"
 SDE_TABLE_NAME = "census.public.dmgs"
 JOIN_FIELD = "FIPS"
-TOTAL_PREFIX = f"{os.path.split(TOTAL_FC_PATH)[-1]}_"
 
 
+# TODO change to logging
 def add_message(text):
     arcpy.AddMessage(text)
 
@@ -63,12 +63,14 @@ def add_county_totals(current_map):
 
 
 def add_ethnicity_data(ethnicity):
+    # query db and only get data for selected ethnicity
     data_path = os.path.join(SDE_PATH, SDE_TABLE_NAME)
     table_name = f"{ethnicity}Table"
 
-    expression = "groupid = '1114'"
+    group_id = get_mapping(ethnicity)
+    expression = f"groupid = '{group_id}'"
 
-    add_message(expression)
+    add_message(f"SQL expression for filtering for id: {expression}")
 
     # add queried data to gdb table
     arcpy.conversion.ExportTable(data_path, table_name, where_clause=expression)
@@ -76,6 +78,7 @@ def add_ethnicity_data(ethnicity):
 
 
 def add_join(current_map, ethnicity):
+    total_prefix = f"{os.path.split(TOTAL_FC_PATH)[-1]}_"
     default_gdb = arcpy.env.workspace
     table_path = f"{default_gdb}\\{ethnicity}Table"
     fc_path = f"{default_gdb}\\{ethnicity}FC"
@@ -103,7 +106,7 @@ def add_join(current_map, ethnicity):
         else:
             add_message(f"Removing prefix from field name for field {field.name}")
             arcpy.management.AlterField(
-                fc_path, field.name, field.name[len(TOTAL_PREFIX) :]
+                fc_path, field.name, field.name[len(total_prefix) :]
             )
 
     # Set nulls to zeroes
