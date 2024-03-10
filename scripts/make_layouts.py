@@ -17,7 +17,7 @@ TEMPLATE_PATH = r"C:\census-automaps\ProProjects\Template\Template.aprx"
 TOTAL_FC_PATH = r"C:\census-automaps\GDBs\Total.gdb\CountiesTotal"
 SDE_PATH = r"C:\census-automaps\SDEs\censusdata.sde"
 SDE_TABLE_NAME = "census.public.dmgs"
-JOIN_FIELD = "FIPS"
+JOIN_FIELD = "fips"
 
 
 # TODO change to logging
@@ -78,10 +78,21 @@ def add_ethnicity_data(ethnicity):
 
 
 def add_join(current_map, ethnicity):
+    # prefix that we will remove from joined fields
     total_prefix = f"{os.path.split(TOTAL_FC_PATH)[-1]}_"
-    default_gdb = arcpy.env.workspace
-    table_path = f"{default_gdb}\\{ethnicity}Table"
-    fc_path = f"{default_gdb}\\{ethnicity}FC"
+
+    # set workspace
+    workspace = os.path.join(GDB_PATH, f"{ethnicity}.gdb")
+    add_message(f"Workspace value: {workspace}")
+
+    arcpy.env.workspace = workspace
+
+    # set overwrite to true
+    arcpy.env.overwriteOutput = True
+
+    # table / fc names
+    table_path = f"{workspace}\\{ethnicity}Table"
+    fc_path = f"{workspace}\\{ethnicity}FC"
 
     # Join fields
     joined_table = arcpy.management.AddJoin(
@@ -92,12 +103,11 @@ def add_join(current_map, ethnicity):
     # Copy to new fc
     arcpy.management.CopyFeatures(joined_table, fc_path)
     add_message(f"Created feature class: {fc_path}")
-    current_map.addDataFromPath(fc_path)
 
     # Remove unnecessary fields
     for field in arcpy.ListFields(fc_path):
         if field.name.startswith(f"{ethnicity}Table_"):
-            if field.name != f"{ethnicity}Table_{ethnicity}":
+            if field.name != f"{ethnicity}Table_total":
                 add_message(f"Deleting field: {field.name}")
                 arcpy.management.DeleteField(fc_path, field.name)
             else:
@@ -125,6 +135,8 @@ def add_join(current_map, ethnicity):
         field_type="FLOAT",
     )
 
+    current_map.addDataFromPath(fc_path)
+
 
 def edit_map_properties(current_map):
     old_sr = current_map.spatialReference.name
@@ -147,7 +159,7 @@ def load_ethnicity_data(ethnicity):
     add_county_totals(m)
     add_ethnicity_data(ethnicity)
 
-    # add_join(m, ethnicity)
+    add_join(m, ethnicity)
     # # TODO change symbology
     # edit_map_properties(m)
 
