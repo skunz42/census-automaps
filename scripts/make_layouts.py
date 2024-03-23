@@ -160,8 +160,8 @@ def load_ethnicity_data(ethnicity):
     add_ethnicity_data(ethnicity)
 
     add_join(m, ethnicity)
-    # # TODO change symbology
-    # edit_map_properties(m)
+    # TODO change symbology
+    edit_map_properties(m)
 
     # Make ethnicity directory if doesn't exist
     aprx_dir = os.path.join(PROJECT_PATH, ethnicity)
