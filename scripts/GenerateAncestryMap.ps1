@@ -16,4 +16,5 @@ param (
 
 $Python = "C:\Program Files\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe"
 
-# & $Python make_layouts.py -e $Ethnicity
+$EthnicityFull = "$Ethnicity alone or in any combination"
+& $Python make_layouts.py -e $EthnicityFull

@@ -62,12 +62,12 @@ def add_county_totals(current_map):
         current_map.addDataFromPath(TOTAL_FC_PATH)
 
 
-def add_ethnicity_data(ethnicity):
+def add_ethnicity_data(ethnicity, ethnicity_full):
     # query db and only get data for selected ethnicity
     data_path = os.path.join(SDE_PATH, SDE_TABLE_NAME)
     table_name = f"{ethnicity}Table"
 
-    group_id = get_mapping(ethnicity)
+    group_id = get_mapping(ethnicity_full)
     expression = f"groupid = '{group_id}'"
 
     add_message(f"SQL expression for filtering for id: {expression}")
@@ -146,9 +146,14 @@ def edit_map_properties(current_map):
     current_map.spatialReference = new_sr
 
 
-def load_ethnicity_data(ethnicity):
+def load_ethnicity_data(ethnicity_full):
     # Script execution code goes here
 
+    ethnicity = ethnicity_full[
+        : len(ethnicity_full) - len(" alone or in any combination")
+    ]
+
+    add_message(f"Ethnicity FullName: {ethnicity_full}")
     add_message(f"Ethnicity: {ethnicity}")
 
     aprx = arcpy.mp.ArcGISProject(TEMPLATE_PATH)
@@ -157,7 +162,7 @@ def load_ethnicity_data(ethnicity):
     update_map_properties(m, ethnicity)
 
     add_county_totals(m)
-    add_ethnicity_data(ethnicity)
+    add_ethnicity_data(ethnicity, ethnicity_full)
 
     add_join(m, ethnicity)
     # TODO change symbology
