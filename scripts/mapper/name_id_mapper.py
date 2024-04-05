@@ -1,6 +1,6 @@
 import json
 
-JSON_PATH = r"C:\census-automaps\scripts\name_id_mapping.json"
+JSON_PATH = r"C:\census-automaps\scripts\config\name_id_mapping.json"
 
 
 # return code for group name
