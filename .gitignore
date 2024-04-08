@@ -2,3 +2,4 @@ ProProjects/*
 SDEs/*
 GDBs/*
 **/__pycache__/**
+*.exe

@@ -7,11 +7,13 @@ param (
     })]
     [ArgumentCompleter({
         param($cmd, $param, $wordToComplete)
-        # This is the duplicated part of the code in the [ValidateScipt] attribute.
         [array] $Components = Get-Content ..\config\names.txt
-        $Components -like "$wordToComplete*"
+        $Components -like "$wordToComplete*" | ForEach-Object { if ($_ -match " ") { Write-Output `"$_`" } else { Write-Output $_ } }
     })]
     [String]$Ethnicity
 )
 
-& go run main.go
+$LookupPath = Resolve-Path "../config/name_id_mapping.json"
+
+& go build main.go
+& ./main -ethnicity `"$Ethnicity`" -lookuppath $LookupPath
