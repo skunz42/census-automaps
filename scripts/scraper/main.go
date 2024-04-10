@@ -21,4 +21,7 @@ func main() {
 	fmt.Println("Getting population group code for ethnicity", ethnicity)
 	groupCode := scraper.GetPopGroupCode(ethnicityFull, lookupPath)
 	fmt.Println("Population group code:", groupCode)
+
+	fmt.Println("Pulling census data for group:", ethnicity)
+	scraper.FetchCensusJson(groupCode)
 }

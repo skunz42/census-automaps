@@ -2,6 +2,9 @@ package scraper
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"os"
 )
 
@@ -24,4 +27,40 @@ func GetPopGroupCode(popGroup string, lookupPath string) string {
 	groupCode := groupMapping[popGroup].(string)
 
 	return groupCode
+}
+
+func FetchCensusJson(groupCode string) [][]string {
+	// Returns the json results from a Census API REST request
+
+	// Create url
+	url := fmt.Sprintf("https://api.census.gov/data/2020/dec/ddhca?get=NAME,POPGROUP_LABEL,T01001_001N&POPGROUP=%s&for=county:*", groupCode)
+	fmt.Println(url)
+
+	// Make GET request
+	resp, err := http.Get(url)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	// Check for bad status
+	if resp.StatusCode != 200 {
+		panic("Response status code: " + fmt.Sprint(resp.StatusCode))
+	}
+
+	// Get response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	// Unmarshal results to variable
+	var jsonResponse [][]string
+	if err := json.Unmarshal(body, &jsonResponse); err != nil {
+		panic(err)
+	}
+
+	fmt.Println(len(jsonResponse))
+
+	return jsonResponse
 }

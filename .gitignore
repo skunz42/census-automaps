@@ -3,3 +3,4 @@ SDEs/*
 GDBs/*
 **/__pycache__/**
 *.exe
+scripts/config/apikey.txt

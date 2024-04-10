@@ -1,7 +1,7 @@
 import json
 
-READ_JSON_PATH = r"C:\census-automaps\scripts\popgroup.json"
-WRITE_JSON_PATH = r"C:\census-automaps\scripts\name_id_mapping.json"
+READ_JSON_PATH = r"C:\census-automaps\scripts\config\popgroup.json"
+WRITE_JSON_PATH = r"C:\census-automaps\scripts\config\name_id_mapping2.json"
 FILTER_STRING = "alone or in any combination"
 
 
@@ -17,9 +17,21 @@ def parse_ancestries(mapping, json_data):
     ancestries = json_data["values"]["item"]
     for ancestry_id in ancestries:
         ancestry = ancestries[ancestry_id]
-        if FILTER_STRING in ancestry:
-            print(ancestry)
-            mapping[ancestry] = ancestry_id
+        try:
+            int_ancestry_id = int(ancestry_id)
+            if FILTER_STRING in ancestry or (
+                int_ancestry_id > 4014 and int_ancestry_id < 4051
+            ):
+                # print(ancestry)
+                ancestry_short = ancestry.replace(" alone or in any combination", "")
+                print(ancestry_short)
+                mapping[ancestry] = ancestry_id
+        except ValueError:
+            if FILTER_STRING in ancestry:
+                # print(ancestry)
+                ancestry_short = ancestry.replace(" alone or in any combination", "")
+                print(ancestry_short)
+                mapping[ancestry] = ancestry_id
 
 
 def write_json_data(mapping):
