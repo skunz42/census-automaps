@@ -17,4 +17,4 @@ $LookupPath = Resolve-Path -Path "../config/name_id_mapping.json"
 $Key = Get-Content -Path (Resolve-Path -Path "../config/apikey.txt")
 
 & go build main.go
-& ./main -ethnicity `"$Ethnicity`" -lookuppath $LookupPath
+& ./main -ethnicity `"$Ethnicity`" -lookuppath $LookupPath -key $Key

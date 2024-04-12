@@ -29,11 +29,11 @@ func GetPopGroupCode(popGroup string, lookupPath string) string {
 	return groupCode
 }
 
-func FetchCensusJson(groupCode string) [][]string {
+func FetchCensusJson(groupCode string, key string) [][]string {
 	// Returns the json results from a Census API REST request
 
 	// Create url
-	url := fmt.Sprintf("https://api.census.gov/data/2020/dec/ddhca?get=NAME,POPGROUP_LABEL,T01001_001N&POPGROUP=%s&for=county:*", groupCode)
+	url := fmt.Sprintf("https://api.census.gov/data/2020/dec/ddhca?get=NAME,POPGROUP_LABEL,T01001_001N&POPGROUP=%s&for=county:*&key=%s", groupCode, key)
 	fmt.Println(url)
 
 	// Make GET request

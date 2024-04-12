@@ -12,16 +12,18 @@ import (
 func main() {
 	ethnicityArg := flag.String("ethnicity", "", "Ethnicity we are searching for")
 	lookupPathArg := flag.String("lookuppath", "", "Path where mappings are stored")
+	keyArg := flag.String("key", "", "Census API key")
 
 	flag.Parse()
 	ethnicity := *ethnicityArg
 	ethnicityFull := ethnicity + " alone or in any combination"
 	lookupPath := *lookupPathArg
+	key := *keyArg
 
 	fmt.Println("Getting population group code for ethnicity", ethnicity)
 	groupCode := scraper.GetPopGroupCode(ethnicityFull, lookupPath)
 	fmt.Println("Population group code:", groupCode)
 
 	fmt.Println("Pulling census data for group:", ethnicity)
-	scraper.FetchCensusJson(groupCode)
+	scraper.FetchCensusJson(groupCode, key)
 }
